@@ -37,6 +37,7 @@ import com.github.mikephil.charting.formatter.DefaultValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.highlight.ChartHighlighter;
 import com.github.mikephil.charting.highlight.Highlight;
+import com.github.mikephil.charting.background.BackgroundRange;
 import com.github.mikephil.charting.highlight.IHighlighter;
 import com.github.mikephil.charting.interfaces.dataprovider.ChartInterface;
 import com.github.mikephil.charting.interfaces.datasets.IDataSet;
@@ -453,6 +454,8 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
      */
     protected Highlight[] mIndicesToHighlight;
 
+    protected BackgroundRange[] mBackgroundRanges;
+
     /**
      * The maximum distance in dp away from an entry causing it to highlight.
      */
@@ -481,6 +484,10 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
      */
     public Highlight[] getHighlighted() {
         return mIndicesToHighlight;
+    }
+
+    public BackgroundRange[] getBackgroundRanges() {
+        return mBackgroundRanges;
     }
 
     /**
@@ -543,6 +550,18 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
         mIndicesToHighlight = highs;
 
         setLastHighlighted(highs);
+
+        // redraw the chart
+        invalidate();
+    }
+
+    /**
+     *
+     * @param ranges
+     */
+    public void backgroundRanges(BackgroundRange[] ranges) {
+
+        mBackgroundRanges = ranges;
 
         // redraw the chart
         invalidate();
@@ -723,6 +742,9 @@ public abstract class Chart<T extends ChartData<? extends IDataSet<? extends Ent
             Highlight highlight = mIndicesToHighlight[i];
 
             IDataSet set = mData.getDataSetByIndex(highlight.getDataSetIndex());
+            if (set == null) {
+                continue;
+            }    
 
             Entry e = mData.getEntryForHighlight(mIndicesToHighlight[i]);
             int entryIndex = set.getEntryIndex(e);
